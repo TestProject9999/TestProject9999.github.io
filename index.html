@@ -1,259 +1,548 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VOID CITY</title>
 
-    <title>VOID // Underground Network</title>
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+body {
+    background: #050505;
+    color: white;
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+}
 
-        body {
-            background: #050505;
-            color: #b8ffb8;
-            font-family: "Courier New", monospace;
-        }
+#game {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    background: #222;
+}
 
-        header {
-            border-bottom: 1px solid #1d4d1d;
-            padding: 20px 8%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #080808;
-        }
+canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
 
-        .logo {
-            font-size: 22px;
-            color: #39ff14;
-            font-weight: bold;
-        }
+#hud {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: rgba(0,0,0,.75);
+    padding: 15px 18px;
+    border-radius: 8px;
+    font-family: monospace;
+    min-width: 190px;
+}
 
-        nav a {
-            color: #777;
-            text-decoration: none;
-            margin-left: 25px;
-        }
+#money {
+    color: #39ff14;
+    font-size: 22px;
+    font-weight: bold;
+}
 
-        nav a:hover {
-            color: #39ff14;
-        }
+#wanted {
+    color: #ffd400;
+    font-size: 20px;
+    margin-top: 5px;
+}
 
-        .hero {
-            min-height: 500px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 40px 20px;
-        }
+#instructions {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    background: rgba(0,0,0,.7);
+    padding: 12px;
+    border-radius: 6px;
+    font-family: monospace;
+    color: #bbb;
+}
 
-        .hero h1 {
-            color: #39ff14;
-            font-size: 58px;
-            margin-bottom: 20px;
-            text-shadow: 0 0 15px #0f0;
-        }
+#message {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(0,0,0,.75);
+    padding: 12px 18px;
+    border-radius: 6px;
+    font-family: monospace;
+}
 
-        .hero p {
-            color: #777;
-            max-width: 650px;
-            margin: auto;
-            line-height: 1.8;
-        }
+#startScreen {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
 
-        .terminal {
-            margin-top: 35px;
-            border: 1px solid #1d4d1d;
-            padding: 20px;
-            text-align: left;
-            max-width: 650px;
-            background: #080808;
-        }
+#startScreen h1 {
+    font-size: 55px;
+    margin-bottom: 10px;
+    color: #39ff14;
+}
 
-        .terminal span {
-            color: #39ff14;
-        }
+#startScreen p {
+    color: #888;
+    margin-bottom: 25px;
+}
 
-        .section {
-            padding: 70px 8%;
-            background: #080808;
-            border-top: 1px solid #111;
-        }
+button {
+    background: #39ff14;
+    border: none;
+    padding: 14px 30px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 16px;
+}
 
-        .section h2 {
-            color: #39ff14;
-            margin-bottom: 30px;
-        }
-
-        .cards {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-
-        .card {
-            border: 1px solid #1d4d1d;
-            background: #050505;
-            padding: 25px;
-            width: 300px;
-        }
-
-        .card h3 {
-            color: #ddd;
-            margin-bottom: 10px;
-        }
-
-        .card p {
-            color: #666;
-            line-height: 1.6;
-        }
-
-        .status {
-            color: #39ff14;
-            font-size: 13px;
-            margin-top: 15px;
-        }
-
-        footer {
-            padding: 30px;
-            text-align: center;
-            color: #444;
-            border-top: 1px solid #111;
-        }
-
-        @media (max-width: 700px) {
-            .hero h1 {
-                font-size: 38px;
-            }
-
-            header {
-                padding: 20px;
-            }
-
-            nav a {
-                margin-left: 10px;
-            }
-        }
-    </style>
+button:hover {
+    background: #25c900;
+}
+</style>
 </head>
 
 <body>
 
-<header>
-    <div class="logo">VOID://</div>
+<div id="game">
 
-    <nav>
-        <a href="#">HOME</a>
-        <a href="#network">NETWORK</a>
-        <a href="#status">STATUS</a>
-    </nav>
-</header>
+<canvas id="canvas"></canvas>
 
+<div id="hud">
+    <div>PLAYER</div>
+    <div id="money">$0</div>
+    <div id="wanted">WANTED: ☆☆☆☆☆</div>
+</div>
 
-<section class="hero">
+<div id="message">
+    ON FOOT
+</div>
 
+<div id="instructions">
+    WASD / ARROW KEYS = MOVE<br>
+    E = ENTER / EXIT CAR<br>
+    COLLECT THE CASH
+</div>
+
+<div id="startScreen">
     <div>
-
-        <h1>WELCOME TO THE VOID</h1>
-
-        <p>
-            An experimental fictional interface inspired by
-            underground networks, terminal systems and anonymous
-            digital spaces.
-        </p>
-
-        <div class="terminal">
-            <div><span>root@void:~$</span> connecting...</div>
-            <div><span>root@void:~$</span> establishing encrypted channel...</div>
-            <div><span>root@void:~$</span> connection established.</div>
-            <br>
-            <div>ACCESS LEVEL: GUEST</div>
-            <div>NETWORK STATUS: ONLINE</div>
-        </div>
-
+        <h1>VOID CITY</h1>
+        <p>A tiny open-world experiment.</p>
+        <button id="start">START GAME</button>
     </div>
+</div>
 
-</section>
+</div>
 
+<script>
 
-<section class="section" id="network">
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
 
-    <h2>// NETWORK NODES</h2>
+function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
 
-    <div class="cards">
+resize();
+window.addEventListener("resize", resize);
 
-        <div class="card">
-            <h3>NODE_001</h3>
-            <p>
-                Anonymous discussion network.
-                Experimental communications environment.
-            </p>
+const keys = {};
 
-            <div class="status">
-                ● ONLINE
-            </div>
-        </div>
+window.addEventListener("keydown", e => {
+    keys[e.key.toLowerCase()] = true;
 
+    if (e.key.toLowerCase() === "e") {
+        toggleCar();
+    }
+});
 
-        <div class="card">
-            <h3>NODE_002</h3>
-            <p>
-                Secure fictional archive containing
-                simulated documents and records.
-            </p>
+window.addEventListener("keyup", e => {
+    keys[e.key.toLowerCase()] = false;
+});
 
-            <div class="status">
-                ● ONLINE
-            </div>
-        </div>
+let gameStarted = false;
 
+const player = {
+    x: 500,
+    y: 400,
+    size: 18,
+    speed: 3,
+    inCar: false
+};
 
-        <div class="card">
-            <h3>NODE_003</h3>
-            <p>
-                Experimental digital marketplace interface.
-                All content is fictional.
-            </p>
+const car = {
+    x: 600,
+    y: 400,
+    width: 50,
+    height: 28,
+    speed: 5
+};
 
-            <div class="status">
-                ● ONLINE
-            </div>
-        </div>
+let money = 0;
+let wanted = 0;
 
-    </div>
+const cash = [];
 
-</section>
+for (let i = 0; i < 15; i++) {
+    cash.push({
+        x: 150 + Math.random() * 1400,
+        y: 100 + Math.random() * 900,
+        collected: false
+    });
+}
 
+const buildings = [];
 
-<section class="section" id="status">
+for (let x = 0; x < 1800; x += 300) {
 
-    <h2>// SYSTEM STATUS</h2>
+    for (let y = 0; y < 1200; y += 300) {
 
-    <div class="terminal">
+        buildings.push({
+            x: x + 30,
+            y: y + 30,
+            width: 210,
+            height: 180
+        });
 
-        <div>NETWORK ............ <span>ONLINE</span></div>
-        <div>DATABASE ........... <span>ONLINE</span></div>
-        <div>ENCRYPTION ......... <span>ACTIVE</span></div>
-        <div>USERS ONLINE ....... 1,337</div>
-        <div>UPTIME ............. 99.97%</div>
+    }
 
-    </div>
+}
 
-</section>
+const police = [];
 
+function spawnPolice() {
 
-<footer>
-    VOID:// Experimental Network
-    <br>
-    <br>
-    Fictional project. No real underground network exists here.
-</footer>
+    if (wanted <= 0) return;
+
+    if (police.length < wanted) {
+
+        police.push({
+            x: player.x + 400,
+            y: player.y + 300,
+            speed: 1.5
+        });
+
+    }
+
+}
+
+function distance(a,b) {
+
+    return Math.sqrt(
+        Math.pow(a.x-b.x,2) +
+        Math.pow(a.y-b.y,2)
+    );
+
+}
+
+function toggleCar() {
+
+    if (!gameStarted) return;
+
+    if (!player.inCar) {
+
+        if (distance(player, car) < 70) {
+
+            player.inCar = true;
+            document.getElementById("message").textContent =
+                "IN VEHICLE";
+
+        }
+
+    } else {
+
+        player.inCar = false;
+
+        player.x = car.x + 60;
+        player.y = car.y;
+
+        document.getElementById("message").textContent =
+            "ON FOOT";
+
+    }
+
+}
+
+function update() {
+
+    if (!gameStarted) return;
+
+    let speed = player.inCar ? car.speed : player.speed;
+
+    let dx = 0;
+    let dy = 0;
+
+    if (keys["w"] || keys["arrowup"]) dy -= speed;
+    if (keys["s"] || keys["arrowdown"]) dy += speed;
+    if (keys["a"] || keys["arrowleft"]) dx -= speed;
+    if (keys["d"] || keys["arrowright"]) dx += speed;
+
+    if (player.inCar) {
+
+        car.x += dx;
+        car.y += dy;
+
+        player.x = car.x;
+        player.y = car.y;
+
+    } else {
+
+        player.x += dx;
+        player.y += dy;
+
+    }
+
+    player.x = Math.max(20, Math.min(1800, player.x));
+    player.y = Math.max(20, Math.min(1200, player.y));
+
+    for (const c of cash) {
+
+        if (!c.collected && distance(player,c) < 30) {
+
+            c.collected = true;
+
+            money += 100;
+
+            wanted = Math.min(5, wanted + 1);
+
+            document.getElementById("money").textContent =
+                "$" + money;
+
+            document.getElementById("wanted").textContent =
+                "WANTED: " + "★".repeat(wanted) +
+                "☆".repeat(5-wanted);
+
+        }
+
+    }
+
+    spawnPolice();
+
+    for (const cop of police) {
+
+        const d = distance(cop, player);
+
+        if (d > 5) {
+
+            cop.x +=
+                ((player.x-cop.x)/d) *
+                cop.speed;
+
+            cop.y +=
+                ((player.y-cop.y)/d) *
+                cop.speed;
+
+        }
+
+        if (d < 30) {
+
+            money = Math.max(0, money - 50);
+
+            document.getElementById("money").textContent =
+                "$" + money;
+
+            cop.x += 100;
+            cop.y += 100;
+
+        }
+
+    }
+
+}
+
+function drawWorld() {
+
+    ctx.fillStyle = "#292929";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    const cameraX =
+        player.x - canvas.width / 2;
+
+    const cameraY =
+        player.y - canvas.height / 2;
+
+    ctx.save();
+
+    ctx.translate(-cameraX,-cameraY);
+
+    // Roads
+
+    ctx.fillStyle = "#383838";
+
+    for (let x=0; x<1800; x+=300) {
+
+        ctx.fillRect(
+            x,
+            0,
+            300,
+            1200
+        );
+
+    }
+
+    // Buildings
+
+    for (const b of buildings) {
+
+        ctx.fillStyle = "#171717";
+
+        ctx.fillRect(
+            b.x,
+            b.y,
+            b.width,
+            b.height
+        );
+
+        ctx.strokeStyle = "#444";
+
+        ctx.strokeRect(
+            b.x,
+            b.y,
+            b.width,
+            b.height
+        );
+
+        ctx.fillStyle = "#777";
+
+        ctx.font = "12px monospace";
+
+        ctx.fillText(
+            "BUILDING",
+            b.x + 70,
+            b.y + 90
+        );
+
+    }
+
+    // Cash
+
+    for (const c of cash) {
+
+        if (c.collected) continue;
+
+        ctx.fillStyle = "#39ff14";
+
+        ctx.fillRect(
+            c.x - 8,
+            c.y - 8,
+            16,
+            16
+        );
+
+        ctx.fillStyle = "#000";
+
+        ctx.font = "10px Arial";
+
+        ctx.fillText(
+            "$",
+            c.x - 3,
+            c.y + 4
+        );
+
+    }
+
+    // Police
+
+    for (const cop of police) {
+
+        ctx.fillStyle = "#2864ff";
+
+        ctx.fillRect(
+            cop.x - 15,
+            cop.y - 10,
+            30,
+            20
+        );
+
+        ctx.fillStyle = "#ff3333";
+
+        ctx.fillRect(
+            cop.x - 5,
+            cop.y - 14,
+            10,
+            4
+        );
+
+    }
+
+    // Car
+
+    ctx.fillStyle = "#b71c1c";
+
+    ctx.fillRect(
+        car.x - 25,
+        car.y - 14,
+        50,
+        28
+    );
+
+    ctx.fillStyle = "#111";
+
+    ctx.fillRect(
+        car.x - 10,
+        car.y - 10,
+        20,
+        20
+    );
+
+    // Player
+
+    if (!player.inCar) {
+
+        ctx.fillStyle = "#39ff14";
+
+        ctx.beginPath();
+
+        ctx.arc(
+            player.x,
+            player.y,
+            player.size,
+            0,
+            Math.PI*2
+        );
+
+        ctx.fill();
+
+    }
+
+    ctx.restore();
+
+}
+
+function loop() {
+
+    update();
+
+    drawWorld();
+
+    requestAnimationFrame(loop);
+
+}
+
+document.getElementById("start").addEventListener("click", () => {
+
+    gameStarted = true;
+
+    document.getElementById("startScreen").style.display =
+        "none";
+
+});
+
+loop();
+
+</script>
 
 </body>
 </html>
